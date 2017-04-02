@@ -39,6 +39,7 @@ type Transaction struct {
 }
 
 type Update struct {
+	Time     int
 	Previous string
 	Current  string
 }
@@ -220,10 +221,10 @@ func (t *CC) UserChangeContact(stub shim.ChaincodeStubInterface, args []string) 
 		fmt.Println()
 		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 		fmt.Println("                          ＜ UserChangeContact ＞")
-		fmt.Println("                           Incorrect srecretkey")
+		fmt.Println("                           Incorrect secretkey")
 		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 		fmt.Println()
-		return nil, errors.New("[UserChangeContact] Incorrect srecretkey")
+		return nil, errors.New("[UserChangeContact] Incorrect secretkey")
 	}
 	user.Contact = args[2]
 	userByte, _ := json.Marshal(user)
@@ -324,10 +325,10 @@ func (t *CC) AssetRegist(stub shim.ChaincodeStubInterface, args []string) ([]byt
 		fmt.Println()
 		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 		fmt.Println("                           ＜ AssetRegist ＞")
-		fmt.Println("                          Incorrect srecretkey")
+		fmt.Println("                          Incorrect secretkey")
 		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 		fmt.Println()
-		return nil, errors.New("[AssetRegist] Incorrect srecretkey")
+		return nil, errors.New("[AssetRegist] Incorrect secretkey")
 	}
 	asset := Asset{}
 	asset.UserKey = args[0]
@@ -346,9 +347,27 @@ func (t *CC) AssetRegist(stub shim.ChaincodeStubInterface, args []string) ([]byt
 			stub.PutState(args[0], userByte)
 			_Locate[args[3]] = _Locate[args[3]] + key + "/"
 
-			//////////////////////
-			/// update not yet ///
-			//////////////////////
+			timeNow := time.Now().Minute()
+			if timeNow < 10 {
+				timeNow = 0
+			} else if timeNow < 20 {
+				timeNow = 10
+			} else if timeNow < 30 {
+				timeNow = 20
+			} else if timeNow < 40 {
+				timeNow = 30
+			} else if timeNow < 50 {
+				timeNow = 40
+			} else if timeNow < 60 {
+				timeNow = 50
+			}
+			if _Update.Time != timeNow {
+				_Update.Previous = _Update.Current
+				_Update.Current = key + "_R" + "/"
+				_Update.Time = timeNow
+			} else {
+				_Update.Current = _Update.Current + key + "_R" + "/"
+			}
 
 			fmt.Println()
 			fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
@@ -392,10 +411,10 @@ func (t *CC) AssetChange(stub shim.ChaincodeStubInterface, args []string) ([]byt
 				fmt.Println()
 				fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 				fmt.Println("                             ＜ AssetChange ＞")
-				fmt.Println("                           Incorrect srecretkey")
+				fmt.Println("                           Incorrect secretkey")
 				fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 				fmt.Println()
-				return nil, errors.New("[AssetChange] Incorrect srecretkey")
+				return nil, errors.New("[AssetChange] Incorrect secretkey")
 			}
 			asset.StartDate = args[2]
 			asset.EndDate = args[3]
@@ -426,6 +445,29 @@ func (t *CC) AssetChange(stub shim.ChaincodeStubInterface, args []string) ([]byt
 			}
 			assetByte, _ := json.Marshal(asset)
 			stub.PutState(args[0], assetByte)
+
+			timeNow := time.Now().Minute()
+			if timeNow < 10 {
+				timeNow = 0
+			} else if timeNow < 20 {
+				timeNow = 10
+			} else if timeNow < 30 {
+				timeNow = 20
+			} else if timeNow < 40 {
+				timeNow = 30
+			} else if timeNow < 50 {
+				timeNow = 40
+			} else if timeNow < 60 {
+				timeNow = 50
+			}
+			if _Update.Time != timeNow {
+				_Update.Previous = _Update.Current
+				_Update.Current = args[0] + "_C" + "/"
+				_Update.Time = timeNow
+			} else {
+				_Update.Current = _Update.Current + args[0] + "_C" + "/"
+			}
+
 			fmt.Println()
 			fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 			fmt.Println("                             ＜ AssetChange ＞")
@@ -475,10 +517,10 @@ func (t *CC) AssetDelete(stub shim.ChaincodeStubInterface, args []string) ([]byt
 				fmt.Println()
 				fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 				fmt.Println("                             ＜ AssetDelete ＞")
-				fmt.Println("                           Incorrect srecretkey")
+				fmt.Println("                           Incorrect secretkey")
 				fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 				fmt.Println()
-				return nil, errors.New("[AssetDelete] Incorrect srecretkey")
+				return nil, errors.New("[AssetDelete] Incorrect secretkey")
 			}
 
 			user := User{}
@@ -525,6 +567,29 @@ func (t *CC) AssetDelete(stub shim.ChaincodeStubInterface, args []string) ([]byt
 				}
 			}
 			stub.DelState(args[0])
+
+			timeNow := time.Now().Minute()
+			if timeNow < 10 {
+				timeNow = 0
+			} else if timeNow < 20 {
+				timeNow = 10
+			} else if timeNow < 30 {
+				timeNow = 20
+			} else if timeNow < 40 {
+				timeNow = 30
+			} else if timeNow < 50 {
+				timeNow = 40
+			} else if timeNow < 60 {
+				timeNow = 50
+			}
+			if _Update.Time != timeNow {
+				_Update.Previous = _Update.Current
+				_Update.Current = args[0] + "_D" + "/"
+				_Update.Time = timeNow
+			} else {
+				_Update.Current = _Update.Current + args[0] + "_D" + "/"
+			}
+
 			fmt.Println()
 			fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 			fmt.Println("                             ＜ AssetDelete ＞")
@@ -591,19 +656,101 @@ func (t *CC) AssetRead(stub shim.ChaincodeStubInterface, args []string) ([]byte,
 }
 
 // ==================================================================================================
-// zzzzzz
+// TransactionRegist
 // ==================================================================================================
 func (t *CC) TransactionRegist(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	if len(args) != 7 {
+		fmt.Println()
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println("                        ＜ TransactionRegist ＞")
+		fmt.Println("               Incorrect number of arguments. Expecting 7")
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println()
+		return nil, errors.New("[TransactionRegist] Incorrect number of arguments. Expecting 7")
+	}
+	for _, v := range args[0] {
+		if v == 95 || v == 35 {
+			fmt.Println()
+			fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			fmt.Println("                           ＜ AssetRegist ＞")
+			fmt.Println("                           Incorrect userkey")
+			fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+			fmt.Println()
+			return nil, errors.New("[TransactionRegist] Incorrect userkey")
+		}
+	}
+	conf, _ := stub.GetState(args[0])
+	if conf == nil {
+		fmt.Println()
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println("                        ＜ TransactionRegist ＞")
+		fmt.Println("                           Not exist userkey")
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println()
+		return nil, errors.New("[TransactionRegist] Not exist userkey")
+	}
+	user := User{}
+	json.Unmarshal(conf, &user)
+	if user.ScrtKey != args[1] {
+		fmt.Println()
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println("                        ＜ TransactionRegist ＞")
+		fmt.Println("                          Incorrect secretkey")
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println()
+		return nil, errors.New("[TransactionRegist] Incorrect secretkey")
+	}
+	transaction := Transaction{}
+	transaction.ProducerKey = args[0]
+	transaction.ConsumerKey = args[2]
+	transaction.Type = args[3]
+	transaction.StartTime = args[4]
+	transaction.EndTime = args[5]
+	transaction.Cost = args[6]
+
+	transactionByte, _ := json.Marshal(transaction)
+	key := args[0] + "_" + args[2] + "_" + args[3] + "_" + args[4]
+	stub.PutState(key, transactionByte)
+	user.TrctList = user.TrctList + key + "/"
+	userByte, _ := json.Marshal(user)
+	stub.PutState(args[0], userByte)
+
+	fmt.Println()
+	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Println("                        ＜ TransactionRegist ＞")
+	fmt.Println("                            Regist success")
+	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Println()
 
 	return nil, nil
 }
 
 // ==================================================================================================
-// zzzzzz
+// TransactionRead
 // ==================================================================================================
 func (t *CC) TransactionRead(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	if len(args) != 4 {
+		fmt.Println()
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println("                           ＜ TransactionRead ＞")
+		fmt.Println("              Incorrect number of arguments. Expecting 4")
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println()
+		return []byte("Incorrect number of arguments. Expecting 4"), errors.New("[TransactionRead] Incorrect number of arguments. Expecting 4")
+	}
+	key := args[0] + "_" + args[1] + "_" + args[2] + "_" + args[3]
+	conf, _ := stub.GetState(key)
+	if conf == nil {
+		fmt.Println()
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println("                           ＜ TransactionRead ＞")
+		fmt.Println("                           Not exist transaction")
+		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+		fmt.Println()
+		return []byte("Not exist transaction"), errors.New("[TransactionRead] Not exist transaction")
+	}
 
-	return nil, nil
+	return conf, nil
 }
 
 // ==================================================================================================
@@ -632,9 +779,11 @@ func (t *CC) LocateSearch(stub shim.ChaincodeStubInterface, args []string) ([]by
 }
 
 // ==================================================================================================
-// zzzzzz
+// GetUpdate
 // ==================================================================================================
 func (t *CC) GetUpdate(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-
-	return nil, nil
+	if _Update.Previous != "" {
+		return []byte("No update record"), nil
+	}
+	return []byte(_Update.Previous), nil
 }
