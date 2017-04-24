@@ -782,7 +782,7 @@ func (t *CC) LocateSearch(stub shim.ChaincodeStubInterface, args []string) ([]by
 // GetUpdate
 // ==================================================================================================
 func (t *CC) GetUpdate(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	if _Update.Previous != "" {
+	if _Update.Previous == "" {
 		return []byte("No update record"), nil
 	}
 	return []byte(_Update.Previous), nil
