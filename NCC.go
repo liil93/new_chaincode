@@ -101,7 +101,10 @@ func (t *CC) Invoke(stub shim.ChaincodeStubInterface, function string, args []st
 		return t.AssetDelete(stub, args)
 	} else if function == "TransactionRegist" {
 		return t.TransactionRegist(stub, args)
+	} else if function == "Test" {
+		return t.Test(stub, args)
 	}
+
 	fmt.Println()
 	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 	fmt.Println("                               ＜ Invoke ＞")
@@ -786,4 +789,13 @@ func (t *CC) GetUpdate(stub shim.ChaincodeStubInterface, args []string) ([]byte,
 		return []byte("No update record"), nil
 	}
 	return []byte(_Update.Previous), nil
+}
+
+func (t *CC) Test(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+	for i := 0; i < 20; i++ {
+		stub.PutState(strconv.Itoa(i), []byte(strconv.Itoa(i)+"T"))
+	}
+
+	return nil, nil
 }
